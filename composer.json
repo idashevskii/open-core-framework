@@ -8,6 +8,9 @@
       "OpenCore\\": "src/"
     }
   },
+  "scripts": {
+    "test": "phpunit ./tests"
+  },
   "autoload-dev": {
     "psr-4": {
       "OpenCore\\": "tests/"
