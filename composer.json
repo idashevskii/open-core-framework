@@ -20,8 +20,8 @@
     "php": ">=8.1",
     "nyholm/psr7": "^1.5",
     "relay/relay": "~2.0",
-    "open-core/router": "^1.0",
+    "open-core/router": "@dev",
     "nyholm/psr7-server": "^1.0",
-    "open-core/injector": "^1.0"
+    "open-core/injector": "@dev"
   }
 }
