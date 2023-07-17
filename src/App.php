@@ -36,6 +36,7 @@ final class App {
       bool $routerCacheDisabled = false,
       Closure $emitter = null,
       ServerRequestInterface $request = null,
+      string $logger = null,
       bool $enableViews = false,
       array $middlewares = null,
   ) {
@@ -48,7 +49,7 @@ final class App {
     $injector->set(ContainerInterface::class, $injector);
     $injector->set(Injector::class, $injector);
 
-    $injector->set(LoggerInterface::class, new Logger());
+    $injector->set(LoggerInterface::class, $injector->instantiate($logger ?? Logger::class, noCache: true));
 
     $psrFactory = new Psr17Factory();
     $injector->set(ResponseFactoryInterface::class, $psrFactory);
