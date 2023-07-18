@@ -98,8 +98,6 @@ final class App {
       $request = (new ServerRequestCreator($psrFactory, $psrFactory, $psrFactory, $psrFactory))->fromGlobals();
     }
 
-    $injector->set(ServerRequestInterface::class, $request);
-
     $relay = new Relay($queue);
     $response = $relay->handle($request);
 

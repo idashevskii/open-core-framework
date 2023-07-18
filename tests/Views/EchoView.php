@@ -13,15 +13,8 @@ declare(strict_types=1);
 namespace OpenCore\Views;
 
 use OpenCore\AbstractView;
-use Psr\Http\Message\ServerRequestInterface;
 
 class EchoView extends AbstractView {
-
-  private $data;
-
-  public function __construct(ServerRequestInterface $request) {
-    $this->data = (string) $request->getBody();
-  }
 
   public function render() {
     ?>

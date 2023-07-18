@@ -16,6 +16,7 @@ use OpenCore\Controller;
 use OpenCore\Route;
 use OpenCore\Views\EchoView;
 use OpenCore\Views\BaseLayout;
+use OpenCore\Body;
 
 #[Controller('')]
 class Pages {
@@ -30,8 +31,8 @@ class Pages {
   }
 
   #[Route('POST', 'echo')]
-  public function echo() {
-    return EchoView::get();
+  public function echo(#[Body] array $body) {
+    return EchoView::get(['data' => json_encode($body)]);
   }
 
   #[Route('GET', 'multi-slot')]

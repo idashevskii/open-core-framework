@@ -156,12 +156,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/idashevskii/open-core-injector.git",
-                "reference": "ed10f86e97b80efcc1b143a892ecaa86ffd82c6e"
+                "reference": "1b4e8fe60565ab4986327d30ba525ca96271418c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/idashevskii/open-core-injector/zipball/ed10f86e97b80efcc1b143a892ecaa86ffd82c6e",
-                "reference": "ed10f86e97b80efcc1b143a892ecaa86ffd82c6e",
+                "url": "https://api.github.com/repos/idashevskii/open-core-injector/zipball/1b4e8fe60565ab4986327d30ba525ca96271418c",
+                "reference": "1b4e8fe60565ab4986327d30ba525ca96271418c",
                 "shasum": ""
             },
             "require": {
@@ -190,7 +190,7 @@
                 "issues": "https://github.com/idashevskii/open-core-injector/issues",
                 "source": "https://github.com/idashevskii/open-core-injector/tree/main"
             },
-            "time": "2023-07-12T18:36:23+00:00"
+            "time": "2023-07-13T11:17:09+00:00"
         },
         {
             "name": "open-core/router",
@@ -198,12 +198,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/idashevskii/open-core-router.git",
-                "reference": "088f53aa48f8104d6198fe0bf2ef9e89f4aa0681"
+                "reference": "c37bd935fffb2a7a60968eb3691f85eeb2e5f3ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/idashevskii/open-core-router/zipball/088f53aa48f8104d6198fe0bf2ef9e89f4aa0681",
-                "reference": "088f53aa48f8104d6198fe0bf2ef9e89f4aa0681",
+                "url": "https://api.github.com/repos/idashevskii/open-core-router/zipball/c37bd935fffb2a7a60968eb3691f85eeb2e5f3ba",
+                "reference": "c37bd935fffb2a7a60968eb3691f85eeb2e5f3ba",
                 "shasum": ""
             },
             "require": {
@@ -238,7 +238,7 @@
                 "issues": "https://github.com/idashevskii/open-core-router/issues",
                 "source": "https://github.com/idashevskii/open-core-router/tree/main"
             },
-            "time": "2023-07-12T15:14:58+00:00"
+            "time": "2023-07-18T12:10:23+00:00"
         },
         {
             "name": "psr/container",
