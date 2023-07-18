@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "89b13bf07f9cfae947179c223fb1a273",
+    "content-hash": "e5e3ca4307c21aa6508d3e2a5ea89604",
     "packages": [
         {
             "name": "nyholm/psr7",
@@ -198,20 +198,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/idashevskii/open-core-router.git",
-                "reference": "c37bd935fffb2a7a60968eb3691f85eeb2e5f3ba"
+                "reference": "4ac12c92183fb0d4f2f13ba3f55cc26d0796696a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/idashevskii/open-core-router/zipball/c37bd935fffb2a7a60968eb3691f85eeb2e5f3ba",
-                "reference": "c37bd935fffb2a7a60968eb3691f85eeb2e5f3ba",
+                "url": "https://api.github.com/repos/idashevskii/open-core-router/zipball/4ac12c92183fb0d4f2f13ba3f55cc26d0796696a",
+                "reference": "4ac12c92183fb0d4f2f13ba3f55cc26d0796696a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
                 "psr/container": "^2.0",
                 "psr/http-server-handler": "^1.0",
-                "psr/http-server-middleware": "^1.0",
-                "psr/log": "^3.0"
+                "psr/http-server-middleware": "^1.0"
             },
             "provide": {
                 "psr/http-server-handler-implementation": "1.0"
@@ -238,7 +237,7 @@
                 "issues": "https://github.com/idashevskii/open-core-router/issues",
                 "source": "https://github.com/idashevskii/open-core-router/tree/main"
             },
-            "time": "2023-07-18T12:10:23+00:00"
+            "time": "2023-07-18T14:46:16+00:00"
         },
         {
             "name": "psr/container",
