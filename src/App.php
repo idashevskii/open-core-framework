@@ -82,8 +82,8 @@ final class App {
 
     if ($middlewares === null) {
       $middlewares = [
-        Router::class,
-        Executor::class,
+        RouterMiddleware::class,
+        RequestHandler::class,
       ];
     }
 
