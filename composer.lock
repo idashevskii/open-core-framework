@@ -198,12 +198,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/idashevskii/open-core-router.git",
-                "reference": "96eb9a06d5019ad531a66bfc1de767fbe1de7df3"
+                "reference": "d343147809554198bb9e2867509af71bf877bd34"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/idashevskii/open-core-router/zipball/96eb9a06d5019ad531a66bfc1de767fbe1de7df3",
-                "reference": "96eb9a06d5019ad531a66bfc1de767fbe1de7df3",
+                "url": "https://api.github.com/repos/idashevskii/open-core-router/zipball/d343147809554198bb9e2867509af71bf877bd34",
+                "reference": "d343147809554198bb9e2867509af71bf877bd34",
                 "shasum": ""
             },
             "require": {
@@ -237,7 +237,7 @@
                 "issues": "https://github.com/idashevskii/open-core-router/issues",
                 "source": "https://github.com/idashevskii/open-core-router/tree/main"
             },
-            "time": "2023-07-18T23:11:03+00:00"
+            "time": "2023-07-23T15:51:25+00:00"
         },
         {
             "name": "psr/container",

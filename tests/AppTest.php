@@ -20,7 +20,9 @@ use Psr\Http\Message\ResponseInterface;
 final class AppTest extends TestCase {
 
   private static function parseResponse(ResponseInterface $response, bool $stripSpaces = false): string|array {
+    ob_start();
     $body = (string) $response->getBody();
+    $body .= ob_get_clean();
     if (str_contains($response->getHeaderLine('Content-Type'), 'application/json')) {
       $body = json_decode($body, true);
     }
@@ -64,6 +66,14 @@ final class AppTest extends TestCase {
     $this->assertEquals(self::parseResponse($response, stripSpaces: true), $expected);
   }
 
+  public function testHtmlEchoStream() {
+    $payload = ['hello' => 'world'];
+    $response = $this->request('POST', '/echo-stream', payload: $payload);
+    $this->assertEquals($response->getStatusCode(), 200);
+    $expected = '<html><body>' . json_encode($payload) . '</body></html>';
+    $this->assertEquals(self::parseResponse($response, stripSpaces: true), $expected);
+  }
+
   public function testMultiSlotViews() {
     $title = 'title';
     $content = 'content';
@@ -83,11 +93,4 @@ final class AppTest extends TestCase {
     $this->assertEquals(self::parseResponse($response), $payload);
   }
 
-//  public function testViewCollection() {
-//    $payload = ['hello' => 'world'];
-//    $response = $this->request('POST', '/echo', payload: $payload);
-//    $this->assertEquals($response->getStatusCode(), 200);
-//    $expected='<html>'. json_encode($payload).'</html>';
-//    $this->assertEquals(self::parseResponse($response, stripSpaces: true), $expected);
-//  }
 }

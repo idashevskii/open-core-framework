@@ -32,12 +32,17 @@ class Pages {
 
   #[Route('POST', 'echo')]
   public function echo(#[Body] array $body) {
-    return EchoView::get(['data' => json_encode($body)]);
+    return EchoView::stream(['data' => json_encode($body)]);
+  }
+
+  #[Route('POST', 'echo-stream')]
+  public function echoStream(#[Body] array $body) {
+    return EchoView::stream(['data' => json_encode($body)]);
   }
 
   #[Route('GET', 'multi-slot')]
   public function multiSlot(string $title = null, string $content = null) {
-    return BaseLayout::get(['title' => $title], ['main' => function ()use ($content) {
+    return BaseLayout::stream(['title' => $title], ['main' => function ()use ($content) {
             ?>
 
             <p><?= $content ?></p>
