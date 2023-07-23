@@ -20,40 +20,34 @@ use Psr\Http\Message\StreamInterface;
 abstract class AbstractView {
 
   private ?array $props;
-  private ?array $slots;
   public static ?Injector $internalInjector = null;
 
   public abstract function render();
 
-  public static function stream(array $props = null, Closure|array $slots = null): StreamInterface {
-    return new DeferredOutputStream(function ()use ($props, $slots) {
-          static::tag($props, $slots);
+  public static function stream(array $props = null): StreamInterface {
+    return new DeferredOutputStream(function ()use ($props) {
+          static::tag($props);
         });
   }
 
   public function __call($name, $arguments) {
-    return isset($this->slots[$name]) ? ($this->slots[$name])(...$arguments) : null;
+    return isset($this->props[$name]) ? ($this->props[$name])(...$arguments) : null;
   }
 
   public function __get($name) {
     return $this->props[$name] ?? null;
   }
 
-  public function hasSlot($name) {
-    return isset($this->slots[$name]);
-  }
-
-  public function hasProp($name) {
+  public function __isset($name) {
     return isset($this->props[$name]);
   }
 
-  public static function tag(array $props = null, Closure|array $slots = null) {
+  public static function tag(array $props = null) {
     if (!self::$internalInjector) {
       throw new ErrorException('Views not enabled in App');
     }
     $instance = self::$internalInjector->instantiate(static::class, noCache: false);
 
-    $instance->slots = ($slots instanceof Closure) ? ['default' => $slots] : $slots;
     $instance->props = $props;
 
     $instance->render();

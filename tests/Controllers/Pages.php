@@ -42,13 +42,16 @@ class Pages {
 
   #[Route('GET', 'multi-slot')]
   public function multiSlot(string $title = null, string $content = null) {
-    return BaseLayout::stream(['title' => $title], ['main' => function ()use ($content) {
+    return BaseLayout::stream([
+          'title' => $title,
+          'main' => function ()use ($content) {
             ?>
 
             <p><?= $content ?></p>
 
             <?php
-          }]);
+          }
+    ]);
   }
 
 }
