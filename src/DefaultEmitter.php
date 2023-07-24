@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class DefaultEmitter implements Emitter {
 
-  public function emit(ResponseInterface $response) {
+  public function emit(ResponseInterface $response): void {
     foreach ($response->getHeaders() as $name => $values) {
       $first = $name !== 'Set-Cookie';
       foreach ($values as $value) {

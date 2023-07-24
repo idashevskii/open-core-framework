@@ -76,24 +76,23 @@ final class App implements RequestHandlerInterface {
     
   }
 
-  public function handle(ServerRequestInterface $request = null): ResponseInterface {
+  public function handle(ServerRequestInterface $request): ResponseInterface {
     if ($this->config->isViewsEnabled()) {
       AbstractView::$internalInjector = $this->injector;
-    }
-
-    if ($request === null) {
-      $request = $this->injector->instantiate(ServerRequestCreator::class, noCache: true)->fromGlobals();
     }
     $queue = [];
     foreach ($this->middlewares as $class) {
       $queue[] = $this->injector->get($class);
     }
-
     return (new Relay($queue))->handle($request);
   }
 
-  public function emit(ResponseInterface $response): void {
-    $this->config->getEmitter()->emit($response);
+  public function run(ServerRequestInterface $request = null, string $emitter = null) {
+    if ($request === null) {
+      $request = $this->injector->instantiate(ServerRequestCreator::class, noCache: true)->fromGlobals();
+    }
+    $response = $this->handle($request);
+    $this->injector->get($emitter ?? DefaultEmitter::class)->emit($response);
   }
 
 }
