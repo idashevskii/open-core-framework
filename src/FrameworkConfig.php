@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
-use Psr\Http\Message\ResponseInterface;
+interface FrameworkConfig extends RouterConfig {
 
-interface Emitter {
-
-  public function emit(ResponseInterface $response): void;
+  function isViewsEnabled(): bool;
 }

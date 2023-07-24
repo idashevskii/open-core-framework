@@ -17,7 +17,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Relay\Relay;
-use Closure;
 use ErrorException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -28,17 +27,19 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use OpenCore\RouterConfig;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
 
-final class App {
+final class App implements RequestHandlerInterface {
 
-  public static function run(
-      array $controllerDirs = null,
-      bool $routerCacheDisabled = false,
-      Closure $emitter = null,
-      ServerRequestInterface $request = null,
-      string $logger = null,
-      bool $enableViews = false,
+  public const INJECT_SRC_DIR = '$$fcSrcDir';
+  private const INJECT_MIDDLEWARES = '$$fcMiddlewares';
+
+  public static function create(
+      string $srcDir,
       array $middlewares = null,
+      string $config = null,
+      string $logger = null,
   ) {
 
     set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
@@ -46,64 +47,53 @@ final class App {
     });
 
     $injector = Injector::create();
-    $injector->set(ContainerInterface::class, $injector);
-    $injector->set(Injector::class, $injector);
+    $injector->alias(ContainerInterface::class, Injector::class);
+    $injector->alias(LoggerInterface::class, $logger ?? Logger::class);
 
-    $injector->set(LoggerInterface::class, $injector->instantiate($logger ?? Logger::class, noCache: true));
+    $injector->alias(ResponseFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(RequestFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(ServerRequestFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(UriFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(UploadedFileFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(StreamFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(FrameworkConfig::class, $config ?? DefaultFrameworkConfig::class);
+    $injector->alias(RouterConfig::class, FrameworkConfig::class);
 
-    $psrFactory = new Psr17Factory();
-    $injector->set(ResponseFactoryInterface::class, $psrFactory);
-    $injector->set(RequestFactoryInterface::class, $psrFactory);
-    $injector->set(ServerRequestFactoryInterface::class, $psrFactory);
-    $injector->set(UriFactoryInterface::class, $psrFactory);
-    $injector->set(UploadedFileFactoryInterface::class, $psrFactory);
-    $injector->set(StreamFactoryInterface::class, $psrFactory);
+    $injector->set(self::INJECT_SRC_DIR, $srcDir);
+    $injector->set(self::INJECT_MIDDLEWARES, $middlewares ?? [
+          Router::class,
+          RequestHandler::class,
+    ]);
 
-    $injector->set(RouterConfig::class, new class($controllerDirs, !$routerCacheDisabled) implements RouterConfig {
+    return $injector->instantiate(self::class, noCache: true);
+  }
 
-      public function __construct(private $controllerDirs, private $useCache) {
-        
-      }
+  public function __construct(
+      #[Inject(self::INJECT_MIDDLEWARES)] private array $middlewares,
+      private FrameworkConfig $config,
+      private Injector $injector,
+  ) {
+    
+  }
 
-      public function define(RouterCompiler $compiler) {
-        foreach ($this->controllerDirs as $dir => $ns) {
-          $compiler->scan($ns, $dir);
-        }
-      }
-
-      public function isCacheEnabled(): bool {
-        return $this->useCache;
-      }
-    });
-
-    if ($enableViews) {
-      AbstractView::$internalInjector = $injector;
-    }
-
-    if ($middlewares === null) {
-      $middlewares = [
-        RouterMiddleware::class,
-        RequestHandler::class,
-      ];
-    }
-
-    $queue = [];
-    foreach ($middlewares as $mwClass) {
-      $queue[] = $injector->instantiate($mwClass, noCache: true);
+  public function handle(ServerRequestInterface $request = null): ResponseInterface {
+    if ($this->config->isViewsEnabled()) {
+      AbstractView::$internalInjector = $this->injector;
     }
 
     if ($request === null) {
-      $request = (new ServerRequestCreator($psrFactory, $psrFactory, $psrFactory, $psrFactory))->fromGlobals();
+      $request = $this->injector->instantiate(ServerRequestCreator::class, noCache: true)->fromGlobals();
+    }
+    $queue = [];
+    foreach ($this->middlewares as $class) {
+      $queue[] = $this->injector->get($class);
     }
 
-    $relay = new Relay($queue);
-    $response = $relay->handle($request);
+    return (new Relay($queue))->handle($request);
+  }
 
-    if ($emitter !== null) {
-      $emitter($response);
-    } else {
-      (new Emitter())->emit($response);
-    }
+  public function emit(ResponseInterface $response): void {
+    $this->config->getEmitter()->emit($response);
   }
 
 }

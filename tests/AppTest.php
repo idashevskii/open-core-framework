@@ -11,11 +11,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace OpenCore;
+namespace App;
 
 use PHPUnit\Framework\TestCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
+use OpenCore\App;
 
 final class AppTest extends TestCase {
 
@@ -34,22 +35,11 @@ final class AppTest extends TestCase {
 
   public function request(string $method, string $uri, mixed $payload = null): ResponseInterface {
     $psrFactory = new Psr17Factory();
-    $serverRequest = $psrFactory->createServerRequest($method, $uri);
+    $request = $psrFactory->createServerRequest($method, $uri);
     if ($payload !== null) {
-      $serverRequest = $serverRequest->withBody($psrFactory->createStream(json_encode($payload)));
+      $request = $request->withBody($psrFactory->createStream(json_encode($payload)));
     }
-    $response = null;
-    /** @var ResponseInterface $response */
-    App::run(
-        controllerDirs: [__DIR__ => __NAMESPACE__],
-        request: $serverRequest,
-        routerCacheDisabled: true,
-        enableViews: true,
-        emitter: function (ResponseInterface $r)use (&$response) {
-          $response = $r;
-        }
-    );
-    return $response;
+    return App::create(srcDir: __DIR__)->handle($request);
   }
 
   public function testHomePage() {

@@ -10,12 +10,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace OpenCore\Controllers;
+namespace App\Controllers;
 
 use OpenCore\Controller;
 use OpenCore\Route;
-use OpenCore\Views\EchoView;
-use OpenCore\Views\BaseLayout;
+use App\Views\EchoView;
+use App\Views\BaseLayout;
 use OpenCore\Body;
 
 #[Controller('')]

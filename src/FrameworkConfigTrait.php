@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
-use Psr\Http\Message\ResponseInterface;
+trait FrameworkConfigTrait {
 
-interface Emitter {
+  public function isViewsEnabled(): bool {
+    return true;
+  }
 
-  public function emit(ResponseInterface $response): void;
 }

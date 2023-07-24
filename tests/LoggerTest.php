@@ -11,11 +11,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace OpenCore;
+namespace App;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use OpenCore\Logger;
+use OpenCore\LoggerWriter;
 
 final class LoggerTest extends TestCase {
 
