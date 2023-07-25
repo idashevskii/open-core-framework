@@ -13,23 +13,10 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
-use Psr\Container\ContainerInterface;
-use Closure;
-
 class DefaultFrameworkConfig implements FrameworkConfig {
 
-  use FrameworkConfigTrait;
-
-  public function __construct(#[Inject(App::INJECT_SRC_DIR)] protected string $srcDir) {
-    
-  }
-
-  public function storeCompiledData(Closure $dataProvider): array {
-    return $dataProvider();
-  }
-
-  public function getControllerDirs(): array {
-    return ['App\\Controllers' => $this->srcDir . '/Controllers'];
+  public function isViewsEnabled(): bool {
+    return true;
   }
 
 }

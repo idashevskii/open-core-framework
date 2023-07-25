@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
-interface FrameworkConfig extends RouterConfig {
+interface FrameworkConfig {
 
   function isViewsEnabled(): bool;
 }

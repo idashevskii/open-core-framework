@@ -39,6 +39,7 @@ final class App implements RequestHandlerInterface {
       string $srcDir,
       array $middlewares = null,
       string $config = null,
+      string $routerConfig = null,
       string $logger = null,
   ) {
 
@@ -57,7 +58,7 @@ final class App implements RequestHandlerInterface {
     $injector->alias(UploadedFileFactoryInterface::class, Psr17Factory::class);
     $injector->alias(StreamFactoryInterface::class, Psr17Factory::class);
     $injector->alias(FrameworkConfig::class, $config ?? DefaultFrameworkConfig::class);
-    $injector->alias(RouterConfig::class, FrameworkConfig::class);
+    $injector->alias(RouterConfig::class, $routerConfig ?? DefaultRouterConfig::class);
 
     $injector->set(self::INJECT_SRC_DIR, $srcDir);
     $injector->set(self::INJECT_MIDDLEWARES, $middlewares ?? [
