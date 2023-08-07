@@ -93,7 +93,7 @@ final class App implements RequestHandlerInterface {
       $request = $this->injector->instantiate(ServerRequestCreator::class, noCache: true)->fromGlobals();
     }
     $response = $this->handle($request);
-    $this->injector->get($emitter ?? DefaultEmitter::class)->emit($response);
+    $this->injector->get($emitter ?? DefaultEmitter::class)->emit($request, $response);
   }
 
 }
