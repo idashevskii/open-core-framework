@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace OpenCore;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface Emitter {
 
-  public function emit(ResponseInterface $response): void;
+  public function emit(ServerRequestInterface $request, ResponseInterface $response): void;
 }

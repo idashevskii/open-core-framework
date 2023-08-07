@@ -14,20 +14,22 @@ declare(strict_types=1);
 namespace OpenCore;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class DefaultEmitter implements Emitter {
 
-  public function emit(ResponseInterface $response): void {
+  public function emit(ServerRequestInterface $request, ResponseInterface $response): void {
     foreach ($response->getHeaders() as $name => $values) {
       $first = $name !== 'Set-Cookie';
       foreach ($values as $value) {
-        header("$name: $value", $first);
+        header("$name: $value", replace: $first);
         $first = false;
       }
     }
     http_response_code($response->getStatusCode());
-    echo (string) $response->getBody();
-    flush();
+    if ($request->getMethod() !== 'HEAD') {
+      echo (string) $response->getBody();
+    }
   }
 
 }
