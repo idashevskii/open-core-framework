@@ -44,6 +44,7 @@ class Pages {
   public function multiSlot(string $title = null, string $content = null) {
     return BaseLayout::stream([
           'title' => $title,
+          'hasSlot' => fn() => false,
           'main' => function ()use ($content) {
             ?>
 

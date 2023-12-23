@@ -31,11 +31,11 @@ abstract class AbstractView {
   }
 
   public function __call($name, $arguments) {
-    return isset($this->props[$name]) ? ($this->props[$name])(...$arguments) : null;
+    return ($this->props[$name])(...$arguments);
   }
 
   public function __get($name) {
-    return $this->props[$name] ?? null;
+    return $this->props[$name];
   }
 
   public function __isset($name) {
