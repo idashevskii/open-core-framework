@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use OpenCore\Controller;
-use OpenCore\Route;
-use OpenCore\Body;
-use OpenCore\ControllerResponse;
+use OpenCore\Router\{Controller, Route, Body, ControllerResponse};
 
 #[Controller('user')]
 class User {

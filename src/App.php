@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
+use OpenCore\Router\RequestHandler;
+use OpenCore\Router\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -26,7 +28,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
-use OpenCore\RouterConfig;
+use OpenCore\Router\RouterConfig;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 

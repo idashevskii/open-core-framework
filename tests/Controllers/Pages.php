@@ -12,11 +12,9 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use OpenCore\Controller;
-use OpenCore\Route;
+use OpenCore\Router\{Controller, Route, Body};
 use App\Views\EchoView;
 use App\Views\BaseLayout;
-use OpenCore\Body;
 
 #[Controller('')]
 class Pages {

@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use OpenCore\Controller;
-use OpenCore\Route;
-use OpenCore\Body;
+use OpenCore\Router\{Controller, Route, Body};
 
 #[Controller('api')]
 class Api {
