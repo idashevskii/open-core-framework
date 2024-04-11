@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * @license   MIT
@@ -13,20 +11,17 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
+use OpenCore\HttpMessage\DeferredServerRequest;
+use OpenCore\HttpMessage\LimitedPsr17Factory;
 use OpenCore\Router\RequestHandler;
 use OpenCore\Router\Router;
 use Psr\Http\Message\ServerRequestInterface;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7Server\ServerRequestCreator;
-use Relay\Relay;
+use Psr\Http\Server\MiddlewareInterface;
 use ErrorException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\ServerRequestFactoryInterface;
-use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use OpenCore\Router\RouterConfig;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -38,11 +33,12 @@ final class App implements RequestHandlerInterface {
   private const INJECT_MIDDLEWARES = '$$fcMiddlewares';
 
   public static function create(
-      string $srcDir,
-      array $middlewares = null,
-      string $config = null,
-      string $routerConfig = null,
-      string $logger = null,
+    string $srcDir,
+    array $middlewares = null,
+    string $config = null,
+    string $routerConfig = null,
+    string $logger = null,
+    string $psrFactory = null,
   ) {
 
     set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
@@ -53,49 +49,49 @@ final class App implements RequestHandlerInterface {
     $injector->alias(ContainerInterface::class, Injector::class);
     $injector->alias(LoggerInterface::class, $logger ?? Logger::class);
 
-    $injector->alias(ResponseFactoryInterface::class, Psr17Factory::class);
-    $injector->alias(RequestFactoryInterface::class, Psr17Factory::class);
-    $injector->alias(ServerRequestFactoryInterface::class, Psr17Factory::class);
-    $injector->alias(UriFactoryInterface::class, Psr17Factory::class);
-    $injector->alias(UploadedFileFactoryInterface::class, Psr17Factory::class);
-    $injector->alias(StreamFactoryInterface::class, Psr17Factory::class);
+    $injector->alias(ResponseFactoryInterface::class, $psrFactory ?? LimitedPsr17Factory::class);
+    $injector->alias(UriFactoryInterface::class, $psrFactory ?? LimitedPsr17Factory::class);
+    $injector->alias(StreamFactoryInterface::class, $psrFactory ?? LimitedPsr17Factory::class);
     $injector->alias(FrameworkConfig::class, $config ?? DefaultFrameworkConfig::class);
     $injector->alias(RouterConfig::class, $routerConfig ?? DefaultRouterConfig::class);
 
     $injector->set(self::INJECT_SRC_DIR, $srcDir);
     $injector->set(self::INJECT_MIDDLEWARES, $middlewares ?? [
-          Router::class,
-          RequestHandler::class,
+      Router::class,
+      RequestHandler::class,
     ]);
 
     return $injector->instantiate(self::class, noCache: true);
   }
 
   public function __construct(
-      #[Inject(self::INJECT_MIDDLEWARES)] private array $middlewares,
-      private FrameworkConfig $config,
-      private Injector $injector,
+    #[Inject(self::INJECT_MIDDLEWARES)] private array $middlewares,
+    private FrameworkConfig $config,
+    private Injector $injector,
   ) {
-    
-  }
-
-  public function handle(ServerRequestInterface $request): ResponseInterface {
     if ($this->config->isViewsEnabled()) {
       AbstractView::$internalInjector = $this->injector;
     }
-    $queue = [];
-    foreach ($this->middlewares as $class) {
-      $queue[] = $this->injector->get($class);
+  }
+
+  public function handle(ServerRequestInterface $request): ResponseInterface {
+    $mw = $this->injector->get(current($this->middlewares));
+    next($this->middlewares);
+    if ($mw instanceof MiddlewareInterface) {
+      return $mw->process($request, $this);
     }
-    return (new Relay($queue))->handle($request);
+    if ($mw instanceof RequestHandlerInterface) {
+      return $mw->handle($request);
+    }
+    throw new ErrorException('Invalid middleware');
   }
 
   public function run(ServerRequestInterface $request = null, string $emitter = null) {
     if ($request === null) {
-      $request = $this->injector->instantiate(ServerRequestCreator::class, noCache: true)->fromGlobals();
+      $request = new DeferredServerRequest();
     }
+    reset($this->middlewares);
     $response = $this->handle($request);
     $this->injector->get($emitter ?? DefaultEmitter::class)->emit($request, $response);
   }
-
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * @license   MIT
@@ -11,44 +9,32 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace OpenCore;
+namespace OpenCore\HttpMessage;
 
-use Psr\Http\Message\StreamInterface;
-use Closure;
-
-class DeferredOutputStream implements StreamInterface {
-
-  public function __construct(private Closure $outputProducer) {
-    
-  }
-
-  public function __toString(): string {
-    ($this->outputProducer)();
-    return '';
-  }
+trait LimitedStreamTrait {
 
   public function close(): void {
-    
+
   }
 
   public function detach() {
-    
+
   }
 
   public function eof(): bool {
-    
+    return false;
   }
 
   public function getContents(): string {
-    
+    return '';
   }
 
   public function getMetadata(mixed $key = null) {
-    
+
   }
 
   public function getSize() {
-    
+
   }
 
   public function isReadable(): bool {
@@ -64,23 +50,23 @@ class DeferredOutputStream implements StreamInterface {
   }
 
   public function read(int $length): string {
-    
+    return '';
   }
 
   public function rewind() {
-    
+
   }
 
   public function seek(int $offset, int $whence = SEEK_SET) {
-    
+
   }
 
   public function tell(): int {
-    
+    return 0;
   }
 
   public function write(string $string): int {
-    
+    return 0;
   }
 
 }

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace OpenCore;
 
-use Closure;
 use ErrorException;
+use OpenCore\HttpMessage\DeferredOutputStream;
 use Psr\Http\Message\StreamInterface;
 
 abstract class AbstractView {
@@ -25,9 +25,9 @@ abstract class AbstractView {
   public abstract function render();
 
   public static function stream(array $props = null): StreamInterface {
-    return new DeferredOutputStream(function ()use ($props) {
-          static::tag($props);
-        });
+    return new DeferredOutputStream(function () use ($props) {
+      static::tag($props);
+    });
   }
 
   public function __call($name, $arguments) {

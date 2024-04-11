@@ -1,2 +1,2 @@
 # open-core-framework
-PSR Compiant restful annotation based framework
+PSR Compliant restful annotation based framework

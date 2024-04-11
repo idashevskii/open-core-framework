@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Mocks\DummyServerRequest;
+use OpenCore\HttpMessage\LimitedStringStream;
 use PHPUnit\Framework\TestCase;
-use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use OpenCore\App;
 
@@ -34,11 +35,11 @@ final class AppTest extends TestCase {
   }
 
   public function request(string $method, string $uri, mixed $payload = null): ResponseInterface {
-    $psrFactory = new Psr17Factory();
-    $request = $psrFactory->createServerRequest($method, $uri);
-    if ($payload !== null) {
-      $request = $request->withBody($psrFactory->createStream(json_encode($payload)));
-    }
+    $request = new DummyServerRequest(
+      $method,
+      $uri,
+      $payload !== null ? new LimitedStringStream(json_encode($payload)) : null,
+    );
     return App::create(srcDir: __DIR__)->handle($request);
   }
 
@@ -70,9 +71,9 @@ final class AppTest extends TestCase {
     $response = $this->request('GET', "/multi-slot?title=$title&content=$content");
     $this->assertEquals($response->getStatusCode(), 200);
     $expected = "<html>"
-        . "<head><title>$title</title></head>"
-        . "<body><main><p>$content</p></main></body>"
-        . "</html>";
+      . "<head><title>$title</title></head>"
+      . "<body><main><p>$content</p></main></body>"
+      . "</html>";
     $this->assertEquals(self::parseResponse($response, stripSpaces: true), $expected);
   }
 
