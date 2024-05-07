@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * @license   MIT
@@ -14,35 +12,33 @@ declare(strict_types=1);
 namespace OpenCore;
 
 use Psr\Log\AbstractLogger;
-use Exception;
 
 class Logger extends AbstractLogger {
-
-  public function __construct(private LoggerWriter $writer) {
-    ;
-  }
+  public function __construct(private LoggerWriter $writer) {}
 
   public function log($level, string|\Stringable $message, array $context = []): void {
-    $search = [];
-    $replace = [];
+    $search = null;
+    $replace = null;
+    $event = ['level' => $level, 'message' => $message];
     foreach ($context as $key => $val) {
-      if ($key === 'exception' && $val instanceof Exception) {
-        $search[] = '{' . $key . '}';
-        $replace[] = "Exception '" . $val::class . "'\n"
-            . "with message '" . $val->getMessage() . "'\n"
-            . "in '" . $val->getFile() . ":" . $val->getLine() . "'\n"
-            . $val->getTraceAsString();
-        continue;
+      if (is_object($val) && method_exists($val, '__toString')) {
+        $strVal = (string) $val;
+      } else if (is_array($val) || is_object($val)) {
+        $strVal = json_encode($val, flags: JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+      } else {
+        $strVal = (string) $val;
       }
-      if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+      $placeholder = '{' . $key . '}';
+      if (strpos($event['message'], $placeholder) !== false) {
         $search[] = '{' . $key . '}';
-        $replace[] = (string) $val;
+        $replace[] = $strVal;
+      } else {
+        $event[$key] = $strVal;
       }
     }
-    $context['message'] = strtoupper($level) . ': ' . str_replace($search, $replace, $message);
-    $context['format'] = $message;
-    $context['level'] = $level;
-    $this->writer->write($context);
+    if ($search !== null) {
+      $event['message'] = str_replace($search, $replace, $message);
+    }
+    $this->writer->write($event);
   }
-
 }

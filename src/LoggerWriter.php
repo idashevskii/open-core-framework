@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * @license   MIT
@@ -14,9 +12,18 @@ declare(strict_types=1);
 namespace OpenCore;
 
 class LoggerWriter {
-
-  public function write(array $data) {
-    file_put_contents('php://stderr', $data['message'] . "\n");
+  public function write(array $event) {
+    $msg = strtoupper($event['level']) . ': ' . $event['message'];
+    $extraAttrs = null;
+    foreach ($event as $k => $v) {
+      if ($k === 'level' || $k === 'message') {
+        continue;
+      }
+      $extraAttrs[] = "$k=$v";
+    }
+    if ($extraAttrs !== null) {
+      $msg .= ': '.implode(' ', $extraAttrs);
+    }
+    file_put_contents('php://stderr', $msg. "\n");
   }
-
 }

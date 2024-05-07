@@ -26,9 +26,9 @@ use Psr\Http\Message\UriFactoryInterface;
 use OpenCore\Router\RouterConfig;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 final class App implements RequestHandlerInterface {
-
   public const INJECT_SRC_DIR = '$$fcSrcDir';
   private const INJECT_MIDDLEWARES = '$$fcMiddlewares';
 
@@ -38,9 +38,9 @@ final class App implements RequestHandlerInterface {
     string $config = null,
     string $routerConfig = null,
     string $logger = null,
+    string $loggerWriter = null,
     string $psrFactory = null,
   ) {
-
     set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
       throw new ErrorException(message: $errstr, code: 1, severity: $errno, filename: $errfile, line: $errline);
     });
@@ -48,7 +48,9 @@ final class App implements RequestHandlerInterface {
     $injector = Injector::create();
     $injector->alias(ContainerInterface::class, Injector::class);
     $injector->alias(LoggerInterface::class, $logger ?? Logger::class);
-
+    if ($loggerWriter !== null) {
+      $injector->alias(LoggerWriter::class, $loggerWriter);
+    }
     $injector->alias(ResponseFactoryInterface::class, $psrFactory ?? LimitedPsr17Factory::class);
     $injector->alias(UriFactoryInterface::class, $psrFactory ?? LimitedPsr17Factory::class);
     $injector->alias(StreamFactoryInterface::class, $psrFactory ?? LimitedPsr17Factory::class);
@@ -65,9 +67,11 @@ final class App implements RequestHandlerInterface {
   }
 
   public function __construct(
-    #[Inject(self::INJECT_MIDDLEWARES)] private array $middlewares,
+    #[Inject(self::INJECT_MIDDLEWARES)]
+    private array $middlewares,
     private FrameworkConfig $config,
     private Injector $injector,
+    private LoggerInterface $logger,
   ) {
     if ($this->config->isViewsEnabled()) {
       AbstractView::$internalInjector = $this->injector;
@@ -92,6 +96,10 @@ final class App implements RequestHandlerInterface {
     }
     reset($this->middlewares);
     $response = $this->handle($request);
-    $this->injector->get($emitter ?? DefaultEmitter::class)->emit($request, $response);
+    try {
+      $this->injector->get($emitter ?? DefaultEmitter::class)->emit($request, $response);
+    } catch(Throwable $ex) {
+      $this->logger->error('Failed to emit', ['exception' => $ex]);
+    }
   }
 }

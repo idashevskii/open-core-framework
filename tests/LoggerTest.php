@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * @license   MIT
@@ -20,21 +18,17 @@ use OpenCore\Logger;
 use OpenCore\LoggerWriter;
 
 final class LoggerTest extends TestCase {
-
   private LoggerInterface $logger;
   public string $errMsg = '';
 
   protected function setUp(): void {
-    $this->logger = new Logger(new class($this) extends LoggerWriter {
+    $this->logger = new Logger(new class ($this) extends LoggerWriter {
+      public function __construct(private LoggerTest $test) {}
 
-          public function __construct(private LoggerTest $test) {
-            
-          }
-
-          public function write(array $data) {
-            $this->test->errMsg = $data['message'];
-          }
-        });
+      public function write(array $data) {
+        $this->test->errMsg = strtoupper($data['level']).': '.$data['message'];
+      }
+    });
   }
 
   private function log(string $level, string $message, array $context = []) {
@@ -64,12 +58,8 @@ final class LoggerTest extends TestCase {
     $msg = 'some msg';
     $ex = new \Exception($msg);
 
-    $this->assertEquals("ERROR: Exception '" . $ex::class . "'\n"
-        . "with message '" . $ex->getMessage() . "'\n"
-        . "in '" . $ex->getFile() . ":" . $ex->getLine() . "'\n"
-        . $ex->getTraceAsString(), $this->log(LogLevel::ERROR, '{exception}', [
+    $this->assertEquals('ERROR: ' . (string)$ex, $this->log(LogLevel::ERROR, '{exception}', [
           'exception' => $ex,
     ]));
   }
-
 }
